@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="librarys/p5.js"></script>
+    <script src="librarys/p5.play.js"></script>
+</head>
+<body>
+    <script>
+    //JavaScriptファイルの内容
+    
+    //TODO: value_set
+        var sco;
+        //var pr; NOTE: TO class
+        //var x = []; NOTE: TO player class
+        //var y = []; NOTE: TO player class
+        //var px = 400; NOTE: TO player class
+        var py; //NOTE: TO player class
+        var spr;
+        var kaifuku;
+        var Sprites = [];
+        //var ran,ran1,ran3,ran4,ran5,ran6,ran7,ran8 = 0; NOTE: TO enemy class
+        var zi = 0;
+        var g = 0;
+        var gc = 10;
+        var we = 5;
+        var enemy = 0;
+        var bullet =[];
+        var bullet_Group;
+        var enemy3_bullet_Group;
+        var Enemy_Group;
+        var bur5;
+        var bur7;
+        var bur9;
+        //var Enemys = enemy();
+        //var boss_hp = 50; NOTE: TO BOSS class
+        //FUNCTION: setup
+        function setup() {
+            createCanvas(800, 400);
+            textSize(20);
+            textAlign(RIGHT, TOP);
+            fill(255);
+            pr = new player("#7fffd4",400,350,25,10,"Player",0);
+            pr.Initialize();
+            
+            //set_enemy("a",10,"#ffff00");
+            //enemy = 11;
+            background(50);
+            /*pr = createSprite(px,py,25,10); NOTE:TO player class
+            pr.shapeColor = color(200); NOTE:TO player class
+            pr.setCollider("rectangle",0,0,25,10); NOTE:TO player class
+            pr.mouseActive = true; NOTE:TO player class
+            pr.debug = true; NOTE:TO player class
+            pr.score = 0; NOTE:TO player class
+            */
+            Enemy_Group = new Group();
+            bullet_Group = new Group();
+            enemy3_bullet_Group = new Group();
+            /*bur7 = new Group();
+            bur9 = new Group();
+            kaifuku = new Group();*/
+            for(var j = 1;j<=10;j++){
+                var Enemy1 = new enemy2("Enemy2","#ffff00",10*j*5+40,10,20,20,0,0.5,"a");
+                                        //type,  color,   x,        y, wx,wy,Vx, Vy,Sprite
+                Enemy1.Initialize();
+                Sprites.push(Enemy1);
+                Enemy_Group.add(Enemy1.Sprite);
+            }
+        }
+        //FUNCTION: draw
+        function draw() {
+            update();
+        }
+        class Basic_Sprite {
+            constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite){
+                this.type = type;
+                this.color = color;
+                this.x = x;
+                this.y = y;
+                this.wx = wx;
+                this.wy = wy;
+                this.Vx = Vx;
+                this.Vy = Vy;
+            }
+            Initialize(){
+                this.Sprite = createSprite(this.x,this.y,this.wx || 20,this.wy || 20);
+                this.Sprite.shapeColor = this.color;
+                this.Sprite.setCollider("rectangle",0,0,this.wx || 20,this.wy || 20);
+                this.Sprite.mouseActive = true;
+                this.Sprite.debug = true;
+                this.Sprite.velocity.y = this.Vy;
+                this.Sprite.velocity.x = this.Vx;
+            }
+            Update(){
+                if(this.Sprite != undefined){
+                    this.x = this.Sprite.position.x;
+                    this.y = this.Sprite.position.y;
+                    this.Vx = this.Sprite.velocity.x;
+                    this.Vy = this.Sprite.velocity.y;
+                }
+            }
+        }
+        class Bullet extends Basic_Sprite {
+            constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            Update(){
+                super.Update();
+            }
+            attack(){
+                Enemy_Group.collide(bullet_Group,function(a,b){
+                    a.remove();
+                    b.remove();
+                })
+            }
+        }
+        class player extends Basic_Sprite {
+            constructor(color,x,y,wx,wy,Sprite,score){//("#7fffd4",400,350,25,10,"Player",0)
+                super(undefined,color,x,y,wx,wy,undefined,undefined,Sprite);
+                this.score = score;
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            move(){
+                if(g == 0){
+                    this.x = constrain(mouseX,50,width - 50);
+                    this.y = constrain(mouseY,50,width - 50);
+                    this.Sprite.position.x = this.x;
+                    this.Sprite.position.y = this.y;
+                }
+            }
+            bullet_firing(){
+                if(mouseWentDown(LEFT)&& g == 0){
+                    var Own_bullet = new Bullet("Own_bullet","#ffd700",this.x,this.y-5,10,20,null,-1.5);
+                    Own_bullet.Initialize();
+                    bullet.push(Own_bullet);
+                    bullet_Group.add(Own_bullet.Sprite);
+                }
+            }
+            all_execution(){
+                this.move();
+                this.bullet_firing();
+            }
+            Update(){
+                super.Update();
+            }
+        }
+        class enemy1 extends Basic_Sprite {
+            constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite,random){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+                this.random = 0;
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            MOVE(){
+                this.random = Math.floor(Math.random()*2);
+                if(this.random == 0){
+                    this.Sprite.velocity.x += 0.1;
+                }
+                if(this.random == 1){
+                    this.Sprite.velocity.x += -0.1;
+                }
+                if(this.Sprite.position.x >= 800){
+                    this.Sprite.position.x = Math.floor(Math.random()*(721-80)+80);
+                }
+                if(this.Sprite.position.x <= 0){
+                    this.Sprite.position.x = Math.floor(Math.random()*(721-80)+80);
+                }
+                if(this.Sprite.position.y >= 400){
+                    this.Sprite.position.y = 10;
+                    this.Sprite.position.x = Math.floor(Math.random()*(751-50)+50);
+                }
+            }
+            Update(){
+                super.Update();
+            }
+        }
+        class enemy2 extends Basic_Sprite {
+            constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite,sx,sy,c){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+                this.c = 0;
+            }
+            Initialize(){
+                super.Initialize();
+                this.sx = this.x;
+                this.sy = this.y;
+            }
+            MOVE(){
+                this.c += 1;
+                this.x = Math.sin(this.c/10)*10;
+            }
+            Update(){
+                super.Update();
+            }
+            division(){
+                for(var i=1; i<=3; i++){
+                    var NEWEnemy = new enemy1("Enemy1","#ffff00",this.x,this.y,this.wx,this.wy,0,0.5,"a");
+                    NEWEnemy.Initialize();
+                    Sprites.push(NEWEnemy);
+                    Enemy_Group.add(NEWEnemy.Sprite);
+                    //TODO:
+                }
+            }
+            All(){
+                this.MOVE();
+                this.Update();
+                this.division();
+            }
+        }
+        //
+        class enemy3_bullet extends Bullet {
+            constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            Update(){
+                super.Update();
+                this.attack();
+            }
+            attack(){
+                enemy3_bullet_Group.collide(pr.Sprite,function(a,b){
+                    b.remove();
+                })
+            }
+        } 
+        class enemy3 extends Basic_Sprite {
+            constructor(type,color,x,y,sx,wx,wy,Vx,Vy,Sprite,c){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+                this.c = 0;
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            bullet_firing(){
+                this.c =  Math.floor(Math.random()*200);
+                if(this.c == 10){
+                    var e3 = new enemy3_bullet("Enemy3_bullet","#ff0000",this.x,this.y-5,10,20,null,-1.5);
+                    e3.Initialize();
+                    Sprites.push(e3);
+                    enemy3_bullet_Group.add(e3.Sprite);
+                }
+            }
+            Update(){
+                super.Update();
+                this.bullet_firing();
+            }
+        }
+        /*
+        function mousePressed() {
+            if(g == 0){
+                var bur1 = createSprite(px,py - 5,10,20);
+                bur1.shapeColor = color(200);
+                bur1.setCollider("rectangle",0,0,10,20)
+                bur1.mouseActive = true;
+                bur1.debug = true;
+                bur1.velocity.y = -1.5;
+                bur1.life = 100;
+                bur.add(bur1);
+            }
+        }
+        */
+        function* enemy() {
+            //yield ["敵の名前",個数];
+            yield* ["enemy1",10];
+            yield* ["enemy2",10];
+            yield* ["enemy3",10];
+        }
+        function update(){
+            background(50);
+            pr.all_execution();
+            pr.Update();
+            bullet.forEach(function(v,i,a){
+                a[i].Update();
+                a[i].attack();
+            });
+            Sprites.forEach(
+                function(v,i,a){
+                    switch(v.type) {
+                        case "Enemy1": 
+                            a[i].MOVE();
+                            a[i].Update();
+                        case "Enemy3":
+                            a[i].Update();
+                        case "Enemy2":
+                            //a[i].All();
+                            a[i].MOVE();
+                            a[i].Update();
+                            a[i].division();
+                        default: return;
+                    }
+                }
+            );
+            drawSprites();
+            /*
+            if(Enemy_Group.length <= 0){
+                var NextEnemy = Enemys.next();
+                switch(NextEnemy[0]) {
+                        case "Enemy1": 
+                            for(var k=0; k<=NextEnemy[1]; k++){
+                                var Enemy1 = new enemy1("Enemy1","#ffff00",10*j*5+40,10,20,20,0,0.5,"a");
+                                        //type,  color,   x,        y, wx,wy,Vx, Vy,Sprite
+                                Enemy1.Initialize();
+                Sprites.push(Enemy1);
+                Enemy_Group.add(Enemy1.Sprite);
+                            }
+                        case "":
+                            
+                        default: return;
+                }
+            }
+            */
+        }
+    </script>
+</body>
+</html>
