@@ -64,6 +64,7 @@
             kaifuku = new Group();*/
             for(var j = 1;j<=10;j++){
                 var Enemy1 = new enemy2("Enemy2","#ffff00",10*j*5+40,10,20,20,0,0.5,"a");
+                //                      type,    color,    x,        y, wx,wy,Vx,Vy,Sprite,sx,sy,c
                                         //type,  color,   x,        y, wx,wy,Vx, Vy,Sprite
                 Enemy1.Initialize();
                 Sprites.push(Enemy1);
@@ -195,7 +196,7 @@
             }
             MOVE(){
                 this.c += 1;
-                this.x = Math.sin(this.c/10)*10;
+                this.x = this.sx + Math.sin(this.c/10)*10;
             }
             Update(){
                 super.Update();
