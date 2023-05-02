@@ -14,6 +14,7 @@
     
     //TODO: value_set
         var sco;
+        var pr;
         //var pr; NOTE: TO class
         //var x = []; NOTE: TO player class
         //var y = []; NOTE: TO player class
@@ -213,7 +214,9 @@
             All(){
                 this.MOVE();
                 this.Update();
-                this.division();
+                this.Sprite.overlap(pr.Splite,function(){
+                  this.division();
+                })
             }
         }
         //
