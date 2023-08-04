@@ -10,16 +10,13 @@
 </head>
 <body>
     <script>
-    //JavaScriptファイルの内容
-    
-    //TODO: value_set
+        //TODO: value_set
         var sco;
-        var pr;
         //var pr; NOTE: TO class
         //var x = []; NOTE: TO player class
         //var y = []; NOTE: TO player class
         //var px = 400; NOTE: TO player class
-        var py; //NOTE: TO player class
+        //var py = 350; NOTE: TO player class
         var spr;
         var kaifuku;
         var Sprites = [];
@@ -36,7 +33,58 @@
         var bur5;
         var bur7;
         var bur9;
-        //var Enemys = enemy();
+        var enemy_characteristics = {
+                                        enemy1:
+                                            {
+                                                class:"enemy1",
+                                                type:"enemy1",
+                                                color:"#ffff00",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                            },
+                                        enemy2:
+                                            {
+                                                class:"enemy2",
+                                                type:"enemy2",
+                                                color:"#ff00ff",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                            },
+                                        enemy3:
+                                            {
+                                                class:"enemy3",
+                                                type:"enemy3",
+                                                color:"#ff0000",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                            },
+                                        enemy4:
+                                            {
+                                                class:"enemy4",
+                                                type:"enemy4",
+                                                color:"#6495ed",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                            },
+                                        enemy5:
+                                            {
+                                                type:"enemy5",
+                                                color:"#7cfc00",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                            }
+                                    };
+        var Enemys = enemys();
         //var boss_hp = 50; NOTE: TO BOSS class
         //FUNCTION: setup
         function setup() {
@@ -44,7 +92,7 @@
             textSize(20);
             textAlign(RIGHT, TOP);
             fill(255);
-            pr = new player("#7fffd4",400,350,25,10,"Player",0);
+            pr = new player("#7fffd4",400,350,25,10,undefined,0);
             pr.Initialize();
             
             //set_enemy("a",10,"#ffff00");
@@ -64,12 +112,11 @@
             bur9 = new Group();
             kaifuku = new Group();*/
             for(var j = 1;j<=10;j++){
-                var Enemy1 = new enemy2("Enemy2","#ffff00",10*j*5+40,10,20,20,0,0.5,"a");
-                //                      type,    color,    x,        y, wx,wy,Vx,Vy,Sprite,sx,sy,c
+                //var Enemy1 = new enemy1("enemy1","#ffff00",10*j*5+40,10,20,20,0,0.5);
                                         //type,  color,   x,        y, wx,wy,Vx, Vy,Sprite
-                Enemy1.Initialize();
-                Sprites.push(Enemy1);
-                Enemy_Group.add(Enemy1.Sprite);
+                //Enemy1.Initialize();
+                //Sprites.push(Enemy1);
+                //Enemy_Group.add(Enemy1.Sprite);
             }
         }
         //FUNCTION: draw
@@ -95,6 +142,7 @@
                 this.Sprite.debug = true;
                 this.Sprite.velocity.y = this.Vy;
                 this.Sprite.velocity.x = this.Vx;
+                this.Sprite.myName = this.type;
             }
             Update(){
                 if(this.Sprite != undefined){
@@ -146,9 +194,15 @@
                     bullet_Group.add(Own_bullet.Sprite);
                 }
             }
+            attack(){
+                Enemy_Group.collide(this.Sprite,function(a,b){
+                    a.remove();
+                })
+            }
             all_execution(){
                 this.move();
                 this.bullet_firing();
+                //this.attack();
             }
             Update(){
                 super.Update();
@@ -184,6 +238,10 @@
             Update(){
                 super.Update();
             }
+            all_execution(){
+                this.MOVE();
+                this.Update();
+            }
         }
         class enemy2 extends Basic_Sprite {
             constructor(type,color,x,y,wx,wy,Vx,Vy,Sprite,sx,sy,c){
@@ -197,26 +255,39 @@
             }
             MOVE(){
                 this.c += 1;
-                this.x = this.sx + Math.sin(this.c/10)*10;
+                this.x = Math.sin(this.c/10)*100 + this.sx;
+                this.Sprite.position.x = this.x
+                if(this.Sprite.position.x <= 0){
+                    this.Sprite.position.x = Math.floor(Math.random()*(721-80)+80);
+                }
+                if(this.Sprite.position.y >= 400){
+                    this.Sprite.position.y = 10;
+                    this.Sprite.position.x = Math.floor(Math.random()*(751-50)+50);
+                }
             }
             Update(){
                 super.Update();
             }
             division(){
-                for(var i=1; i<=3; i++){
-                    var NEWEnemy = new enemy1("Enemy1","#ffff00",this.x,this.y,this.wx,this.wy,0,0.5,"a");
-                    NEWEnemy.Initialize();
-                    Sprites.push(NEWEnemy);
-                    Enemy_Group.add(NEWEnemy.Sprite);
-                    //TODO:
-                }
+                Enemy_Group.collide(pr.Sprite,function(a,b){
+                    console.log(a);
+                    console.log("bb")
+                    if(a == this.Sprite){
+                        console.log("aa");
+                        for(var i=1; i<=3; i++){
+                            var NEWEnemy = new enemy1("enemy1","#ffff00",this.x,this.y,this.wx,this.wy,0,0.5);
+                            NEWEnemy.Initialize(NEWEnemy);
+                            Sprites.push(NEWEnemy);
+                            Enemy_Group.add(NEWEnemy.Sprite);
+                            //TODO:
+                        }
+                    }
+                });
             }
-            All(){
+            all_execution(){
+                this.division();
                 this.MOVE();
                 this.Update();
-                this.Sprite.overlap(pr.Splite,function(){
-                  this.division();
-                })
             }
         }
         //
@@ -248,15 +319,38 @@
             bullet_firing(){
                 this.c =  Math.floor(Math.random()*200);
                 if(this.c == 10){
-                    var e3 = new enemy3_bullet("Enemy3_bullet","#ff0000",this.x,this.y-5,10,20,null,-1.5);
-                    e3.Initialize();
-                    Sprites.push(e3);
-                    enemy3_bullet_Group.add(e3.Sprite);
+                    var NewEnemy = new enemy3_bullet("Enemy3_bullet","#ff0000",this.x,this.y-5,10,20,null,-1.5);
+                    NewEnemy.Initialize();
+                    Sprites.push(NewEnemy);
+                    enemy3_bullet_Group.add(NewEnemy.Sprite);
                 }
             }
             Update(){
                 super.Update();
+            }
+            all_execution(){
+                this.Update();
                 this.bullet_firing();
+            }
+        }
+        class enemy4 extends Basic_Sprite {
+            constructor(type,color,x,y,sx,wx,wy,Vx,Vy,Sprite,c,ax,ay){
+                super(type,color,x,y,wx,wy,Vx,Vy,Sprite);
+                ax = 0;
+                ay = 0;
+            }
+            Initialize(){
+                super.Initialize();
+            }
+            MOVE(){
+                this.Sprite.attractionPoint(0.2,ax,ay);
+            }
+            Update(){
+                super.Update();
+            }
+            all_execution(){
+                this.move();
+                this.Update();
             }
         }
         /*
@@ -273,11 +367,12 @@
             }
         }
         */
-        function* enemy() {
-            //yield ["敵の名前",個数];
-            yield* ["enemy1",10];
-            yield* ["enemy2",10];
-            yield* ["enemy3",10];
+        function* enemys() {
+            //yield enemy_characteristics.enemy2;
+            //yield 10;
+
+            yield enemy_characteristics.enemy3;
+            yield 10;
         }
         function update(){
             background(50);
@@ -289,41 +384,45 @@
             });
             Sprites.forEach(
                 function(v,i,a){
-                    switch(v.type) {
-                        case "Enemy1": 
-                            a[i].MOVE();
-                            a[i].Update();
-                        case "Enemy3":
-                            a[i].Update();
-                        case "Enemy2":
-                            //a[i].All();
-                            a[i].MOVE();
-                            a[i].Update();
-                            a[i].division();
-                        default: return;
-                    }
+                    a[i].all_execution();
                 }
             );
             drawSprites();
-            /*
             if(Enemy_Group.length <= 0){
                 var NextEnemy = Enemys.next();
-                switch(NextEnemy[0]) {
-                        case "Enemy1": 
-                            for(var k=0; k<=NextEnemy[1]; k++){
-                                var Enemy1 = new enemy1("Enemy1","#ffff00",10*j*5+40,10,20,20,0,0.5,"a");
-                                        //type,  color,   x,        y, wx,wy,Vx, Vy,Sprite
-                                Enemy1.Initialize();
-                Sprites.push(Enemy1);
-                Enemy_Group.add(Enemy1.Sprite);
-                            }
-                        case "":
-                            
-                        default: return;
+                var Nextnum = Enemys.next();
+                setEnemy(NextEnemy,Nextnum);
+            }
+            function setEnemy(Eneeemy,num,shape) {
+                var shaape = shape || "line";
+                var numm = num.value;
+                var EEneeemy = Eneeemy.value;
+                if(shaape == "line"){
+                    for(var k=0; k<=numm; k++) {
+                        console.log(EEneeemy.color);
+                        
+                        eval(`var Enemy = new ${EEneeemy.class}(${EEneeemy.type},"${EEneeemy.color}",40*k+100,10,${EEneeemy.wx},${EEneeemy.wy},${EEneeemy.Vx},${EEneeemy.Vy});`);
+                        Enemy.Initialize();
+                        Sprites.push(Enemy);
+                        Enemy_Group.add(Enemy.Sprite);
+                    }
                 }
             }
-            */
         }
+        /*
+                                                type:"enemy1",
+                                                color:"ffff00",
+                                                wx:20,
+                                                wy:20,
+                                                Vx:0,
+                                                Vy:0.5
+                                                switch(EEneeemy.type){
+                            case "enemy1":
+
+                            case "enemy2":
+
+                        }
+                                                */
     </script>
 </body>
 </html>
