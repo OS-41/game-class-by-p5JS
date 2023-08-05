@@ -269,7 +269,7 @@
                 super.Update();
             }
             division(){
-                Enemy_Group.collide(pr.Sprite,function(a,b){
+                Enemy_Group.collide(bullet_Group,function(a,b){
                     console.log(a);
                     console.log("bb")
                     if(a == this.Sprite){
