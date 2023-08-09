@@ -164,10 +164,10 @@
                 super.Update();
             }
             attack(){
-                Enemy_Group.collide(bullet_Group,function(a,b){
-                    a.remove();
-                    b.remove();
-                })
+                // Enemy_Group.collide(bullet_Group,function(a,b){
+                //     a.remove();
+                //     b.remove();
+                // })
             }
         }
         class player extends Basic_Sprite {
@@ -235,12 +235,19 @@
                     this.Sprite.position.x = Math.floor(Math.random()*(751-50)+50);
                 }
             }
+            Damage(){
+                Enemy_Group.collide(bullet_Group,function(a,b){
+                    a.remove();
+                    b.remove();
+                })
+            }
             Update(){
                 super.Update();
             }
             all_execution(){
                 this.MOVE();
                 this.Update();
+                this.Damage();
             }
         }
         class enemy2 extends Basic_Sprite {
@@ -269,10 +276,10 @@
                 super.Update();
             }
             division(){
-                Enemy_Group.collide(bullet_Group,function(a,b){
+               this.splite.collide(bullet_Group,function(a,b){
                     console.log(a);
                     console.log("bb")
-                    if(a == this.Sprite){
+                    //if(a == this.Sprite){
                         console.log("aa");
                         for(var i=1; i<=3; i++){
                             var NEWEnemy = new enemy1("enemy1","#ffff00",this.x,this.y,this.wx,this.wy,0,0.5);
@@ -281,7 +288,8 @@
                             Enemy_Group.add(NEWEnemy.Sprite);
                             //TODO:
                         }
-                    }
+                        a.remove();
+                    //}
                 });
             }
             all_execution(){
@@ -325,12 +333,19 @@
                     enemy3_bullet_Group.add(NewEnemy.Sprite);
                 }
             }
+            Damage(){
+                Enemy_Group.collide(bullet_Group,function(a,b){
+                    a.remove();
+                    b.remove();
+                })
+            }
             Update(){
                 super.Update();
             }
             all_execution(){
                 this.Update();
                 this.bullet_firing();
+                this.Damage();
             }
         }
         class enemy4 extends Basic_Sprite {
@@ -343,7 +358,15 @@
                 super.Initialize();
             }
             MOVE(){
+                ax = pr.position.x;
+                ay = pr.position.y;
                 this.Sprite.attractionPoint(0.2,ax,ay);
+            }
+            Damage(){
+                Enemy_Group.collide(bullet_Group,function(a,b){
+                    a.remove();
+                    b.remove();
+                })
             }
             Update(){
                 super.Update();
@@ -351,6 +374,7 @@
             all_execution(){
                 this.move();
                 this.Update();
+                this.Damage();
             }
         }
         /*
@@ -368,8 +392,8 @@
         }
         */
         function* enemys() {
-            //yield enemy_characteristics.enemy2;
-            //yield 10;
+            yield enemy_characteristics.enemy2;
+            yield 10;
 
             yield enemy_characteristics.enemy3;
             yield 10;
@@ -391,21 +415,24 @@
             if(Enemy_Group.length <= 0){
                 var NextEnemy = Enemys.next();
                 var Nextnum = Enemys.next();
-                setEnemy(NextEnemy,Nextnum);
+                if(NextEnemy.value == undefined){
+                    console.log("you win!!");
+                }else{
+                    setEnemy(NextEnemy,Nextnum);
+                }
             }
-            function setEnemy(Eneeemy,num,shape) {
-                var shaape = shape || "line";
-                var numm = num.value;
-                var EEneeemy = Eneeemy.value;
-                if(shaape == "line"){
-                    for(var k=0; k<=numm; k++) {
-                        console.log(EEneeemy.color);
-                        
-                        eval(`var Enemy = new ${EEneeemy.class}(${EEneeemy.type},"${EEneeemy.color}",40*k+100,10,${EEneeemy.wx},${EEneeemy.wy},${EEneeemy.Vx},${EEneeemy.Vy});`);
-                        Enemy.Initialize();
-                        Sprites.push(Enemy);
-                        Enemy_Group.add(Enemy.Sprite);
-                    }
+        }
+        function setEnemy(Eneeemy,num,shape) {
+            var shaape = shape || "line";
+            var numm = num.value;
+            var EEneeemy = Eneeemy.value;
+            if(shaape == "line"){
+                for(var k=0; k<=numm; k++) {
+                    console.log(EEneeemy.color);                
+                    eval(`var Enemy = new ${EEneeemy.class}(${EEneeemy.type},"${EEneeemy.color}",40*k+100,10,${EEneeemy.wx},${EEneeemy.wy},${EEneeemy.Vx},${EEneeemy.Vy});`);
+                    Enemy.Initialize();
+                    Sprites.push(Enemy);
+                    Enemy_Group.add(Enemy.Sprite);
                 }
             }
         }
